@@ -5,6 +5,7 @@ CompileFlags:
       "-std=c++17", # needed when using MSVC
       # you should replace this to your own include path of this project
       "-I/Users/stcx/WorkSpace/Cpp/Algorithms/PathFinding_Learn/include/",
+      "-I/Users/stcx/WorkSpace/Cpp/Algorithms/PathFinding_Learn/test/",
       # -Wno-microsoft-goto,
       # -Wno-nonportable-include-path,
       # -Wno-microsoft-extra-qualification,

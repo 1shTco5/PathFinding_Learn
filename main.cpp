@@ -20,4 +20,7 @@ int main() {
     gmap.A_star(true);
   }
   // gmap.print(true);
+  {
+
+  }
 }
