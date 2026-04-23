@@ -8,6 +8,6 @@ namespace test_jps {
     jump_points.push_back(end);
      */
 
-
+    // https://github.com/KumarRobotics/jps3d
   }
 } // namespace test_jps
