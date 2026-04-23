@@ -20,7 +20,7 @@ grid_map get_grid_map() {
   return gmap;
 }
 
-void grid_map::A_star_4_dir() { path = path_finding::A_star_4_dir(*this); }
+void grid_map::A_star(bool dir_8) { path = path_finding::A_star(*this, dir_8); }
 
 void grid_map::print(bool print_path) {
   std::cout << "Start: (" << start.x << ',' << start.y << ")\n";

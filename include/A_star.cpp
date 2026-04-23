@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cfloat>
 #include <climits>
 #include <functional>
 #include <map_system.h>
@@ -11,9 +12,11 @@ using namespace map_system;
 using namespace utils::distance;
 
 namespace path_finding {
-point dir[4] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+direction dir[8] = {{{0, -1}, 1},      {{0, 1}, 1},        {{-1, 0}, 1},
+                    {{1, 0}, 1},       {{-1, -1}, 1.414f}, {{-1, 1}, 1.414f},
+                    {{1, -1}, 1.414f}, {{1, 1}, 1.414f}};
 
-std::vector<point> A_star_4_dir(grid_map &gmap) {
+std::vector<point> A_star(grid_map &gmap, bool dir_8) {
   std::vector<std::vector<int>> &grid = gmap.grid;
   int width = gmap.width;
   int height = gmap.height;
@@ -26,9 +29,9 @@ std::vector<point> A_star_4_dir(grid_map &gmap) {
    */
   std::priority_queue<node, std::vector<node>, std::greater<node>> open_list;
   std::vector<std::vector<node>> close_list(
-      height, std::vector<node>(width, {{-1, -1}, {-1, -1}, INT_MAX, INT_MAX}));
+      height, std::vector<node>(width, {{-1, -1}, {-1, -1}, FLT_MAX, FLT_MAX}));
 
-  node start_node = {start, {-1, -1}, 0, manhattan(start, end)};
+  node start_node = {start, {-1, -1}, 0, manhattan_plus(start, end, dir_8)};
   open_list.push(start_node);
   close_list[start.y][start.x] = start_node;
   while (!open_list.empty()) {
@@ -40,17 +43,20 @@ std::vector<point> A_star_4_dir(grid_map &gmap) {
     if (curr.g > close_list[curr.y][curr.x].g)
       continue;
 
-    for (int i = 0; i < 4; i++) {
+    int dir_count = dir_8 ? 8 : 4;
+    for (int i = 0; i < dir_count; i++) {
       int nx = curr.x + dir[i].x;
       int ny = curr.y + dir[i].y;
 
       if (nx >= 0 && nx < width && ny >= 0 && ny < height &&
           grid[ny][nx] != 0) {
-        if (close_list[ny][nx].g <= curr.g + grid[ny][nx])
+        if (close_list[ny][nx].g <= curr.g + grid[ny][nx] * dir[i].dist_scale)
           continue;
 
-        node next = {
-            {nx, ny}, curr, curr.g + grid[ny][nx], manhattan({nx, ny}, end)};
+        node next = {{nx, ny},
+                     curr,
+                     curr.g + grid[ny][nx] * dir[i].dist_scale,
+                     manhattan_plus({nx, ny}, end, dir_8)};
         open_list.push(next);
         close_list[ny][nx] = next;
       }

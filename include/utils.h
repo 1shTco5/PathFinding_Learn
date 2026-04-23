@@ -7,7 +7,7 @@ using namespace map_system;
 
 namespace utils {
 namespace distance {
-int manhattan(point s, point e);
+float manhattan_plus(point s, point e, bool dir_8 = false);
 };
 
 namespace time {

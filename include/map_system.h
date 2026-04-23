@@ -36,7 +36,7 @@ public:
   /**
    * @brief A_star寻路
    */
-  void A_star_4_dir();
+  void A_star(bool dir_8 = false);
 
   /**
    * @brief 打印网格地图
