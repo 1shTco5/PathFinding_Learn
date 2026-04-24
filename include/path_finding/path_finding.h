@@ -38,4 +38,9 @@ struct direction : public point {
  */
 std::vector<point> A_star(grid_map &gmap, bool dir_8 = false);
 } // namespace A_star
+
+namespace JPS {
+
+}
+
 } // namespace path_finding
