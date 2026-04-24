@@ -7,10 +7,9 @@ bool grid_map::is_walkable(point p) const {
     return false;
   return grid[p.y][p.x] != 0;
 }
-float grid_map::get_cost(point p, bool is_diag) const {
+float grid_map::get_cost(point p) const {
   if (is_walkable(p)) {
-    float cost_scale = is_diag ? SQRT2 : 1;
-    return static_cast<float>(grid[p.y][p.x]) * cost_scale;
+    return static_cast<float>(grid[p.y][p.x]);
   }
   return FLT_MAX;
 }

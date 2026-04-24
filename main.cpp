@@ -9,17 +9,17 @@ using namespace path_finding;
 
 int main() {
   grid_map gmap = get_grid_map();
-  gmap.print();
+  // gmap.print();
   {
     time::timer timer("A star[4 dir]");
-    gmap.path = A_star::A_star(gmap);
+    gmap.path = A_star::find_path(gmap, gmap.start, gmap.end);
   }
-  gmap.print(true);
+  // gmap.print(true);
   {
     time::timer timer("A star[8 dir]");
-    gmap.path = A_star::A_star(gmap, true);
+    gmap.path = A_star::find_path(gmap, gmap.start, gmap.end, true);
   }
-  gmap.print(true);
+  // gmap.print(true);
   {
 
   }

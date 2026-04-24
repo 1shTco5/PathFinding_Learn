@@ -1,4 +1,5 @@
 #include <map_system.h>
+#include <queue>
 #include <vector>
 
 using namespace map_system;
@@ -21,11 +22,29 @@ struct node : public point {
   inline bool operator>(const node &other) const { return f() > other.f(); }
 };
 
+class path_finder {
+private:
+  const i_path_context &ctx;
+  /**
+   * @open_list 存储待处理点 用优先队列 快速找到启发式函数最小的点
+   * @close_list 标记已处理点 同时记录当前点的父节点 用于回溯路线
+   */
+  std::priority_queue<node, std::vector<node>, std::greater<node>> open_list;
+  std::vector<std::vector<node>> closed_list;
+
+  void init(point start, point end, bool dir_8);
+
+public:
+  path_finder(const i_path_context &ctx) : ctx(ctx) {}
+  std::vector<point> find_path(point start, point end, bool dir_8);
+};
+
 /**
  * @brief A_star寻路算法
  * @return 起点到终点的路径. 若不能到终点, 返回{}
  */
-std::vector<point> A_star(grid_map &gmap, bool dir_8 = false);
+std::vector<point> find_path(const i_path_context &context, point start,
+                             point end, bool dir_8 = false);
 } // namespace A_star
 
 namespace JPS {}

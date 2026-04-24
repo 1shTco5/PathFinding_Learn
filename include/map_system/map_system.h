@@ -37,7 +37,7 @@ class i_path_context {
 public:
   virtual ~i_path_context() = default;
   virtual bool is_walkable(point p) const = 0;
-  virtual float get_cost(point p, bool is_diag = false) const = 0;
+  virtual float get_cost(point p) const = 0;
   virtual int get_width() const = 0;
   virtual int get_height() const = 0;
 };
@@ -62,7 +62,7 @@ public:
 
   /* 实现 i_path_context 接口 */
   bool is_walkable(point p) const override;
-  float get_cost(point p, bool is_diag = false) const override;
+  float get_cost(point p) const override;
   int get_width() const override;
   int get_height() const override;
 
