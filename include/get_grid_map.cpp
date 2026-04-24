@@ -11,8 +11,12 @@ grid_map get_grid_map() {
   int width, height;
   std::cin >> width >> height;
 
+  std::cout << "Input obstacle density: \n";
+  float obstacle_density;
+  std::cin >> obstacle_density;
+
   grid_map_generator generator(width, height, seed);
-  grid_map gmap = generator.generate();
+  grid_map gmap = generator.generate(obstacle_density);
   return gmap;
 }
 } // namespace map_system

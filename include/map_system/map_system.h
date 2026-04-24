@@ -14,6 +14,9 @@ struct point {
   int x, y;
 
   constexpr point(int x, int y) : x(x), y(y) {}
+
+  bool operator==(const point &other) { return x == other.x && y == other.y; }
+  bool operator!=(const point &other) { return !(*this == other); }
 };
 
 /**
@@ -23,7 +26,10 @@ struct point {
 struct direction : public point {
   float dist_scale;
 
-  constexpr direction(point dir, float scale) : point(dir), dist_scale(scale) {}
+  constexpr direction(point dir, float scale = 1)
+      : point(dir), dist_scale(scale) {}
+  constexpr direction(int x, int y, float scale = 1)
+      : point{x, y}, dist_scale(scale) {}
 };
 
 constexpr direction DIR[8] = {

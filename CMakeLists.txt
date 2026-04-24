@@ -27,6 +27,7 @@ set(
 
   # ./include/path_finding/
   "${PATH_FIND}/A_star.cpp"
+  "${PATH_FIND}/test_JPS.cpp"
 
   # ./include/utils/
   "${UTILS}/distance.cpp"

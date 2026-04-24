@@ -6,22 +6,21 @@
 #include <utils.h>
 #include <vector>
 
-using namespace map_system;
 using namespace utils::distance;
 
 namespace path_finding {
 namespace A_star {
 
-std::vector<point> find_path(const i_path_context &context, point start,
-                             point end, bool dir_8) {
-  return path_finder(context).find_path(start, end, dir_8);
+std::vector<point> find_path(const i_path_context &ctx, point start, point end,
+                             bool dir_8) {
+  return path_finder(ctx).find_path(start, end, dir_8);
 }
 
 void path_finder::init(point start, point end, bool dir_8) {
   open_list = {};
-  closed_list.resize(ctx.get_height(),
-                     std::vector<node>(ctx.get_width(),
-                                       {{-1, -1}, {-1, -1}, FLT_MAX, FLT_MAX}));
+  for (int i = 0; i < ctx.get_height(); i++) {
+    closed_list[i].assign(ctx.get_width(), default_node);
+  }
 
   node start_node = {start, {-1, -1}, 0, manhattan_plus(start, end, dir_8)};
   open_list.push(start_node);
@@ -35,7 +34,7 @@ std::vector<point> path_finder::find_path(point start, point end, bool dir_8) {
     node curr = open_list.top();
     open_list.pop();
 
-    if (curr.x == end.x && curr.y == end.y)
+    if (curr == end)
       break;
     if (curr.g > closed_list[curr.y][curr.x].g)
       continue;
@@ -46,13 +45,13 @@ std::vector<point> path_finder::find_path(point start, point end, bool dir_8) {
       int ny = curr.y + DIR[i].y;
 
       if (ctx.is_walkable({nx, ny})) {
-        if (closed_list[ny][nx].g <=
-            curr.g + ctx.get_cost({nx, ny}) * DIR[i].dist_scale)
+        float new_g = curr.g + ctx.get_cost({nx, ny}) * DIR[i].dist_scale;
+        if (closed_list[ny][nx].g <= new_g)
           continue;
 
         node next = {{nx, ny},
                      curr,
-                     curr.g + ctx.get_cost({nx, ny}) * DIR[i].dist_scale,
+                     new_g,
                      manhattan_plus({nx, ny}, end, dir_8)};
         open_list.push(next);
         closed_list[ny][nx] = next;
