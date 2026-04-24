@@ -25,12 +25,16 @@ int main(int argc, char *argv[]) {
     time::timer timer("--- A star[8 dir] ---");
     gmap.path = A_star::find_path(gmap, gmap.start, gmap.end, true);
   }
-  if (should_print)
+  if (should_print) {
     gmap.print(true);
+    cout << "Node [A star]: " << gmap.path.size() << endl;
+  }
   {
     time::timer timer("--- JPS ---");
     gmap.path = JPS::find_path(gmap, gmap.start, gmap.end);
   }
-  if (should_print)
+  if (should_print) {
     gmap.print(true);
+    cout << "Node [JPS]: " << gmap.path.size() << endl;
+  }
 }

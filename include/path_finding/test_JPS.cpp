@@ -60,6 +60,8 @@ search_directions path_finder::get_search_dirs(e_dir dir) {
 point path_finder::jump(point curr, e_dir dir, point start, point end) {
   /* 迭代版本 */
   const auto &d = EDIR_TO_DIR[static_cast<int>(dir)];
+  e_dir dir_horiz = direction(d.x, 0).to_enum();
+  e_dir dir_vert = direction(0, d.y).to_enum();
 
   while (true) {
     curr.x += d.x;
@@ -72,17 +74,10 @@ point path_finder::jump(point curr, e_dir dir, point start, point end) {
     if (has_forced_neighbor(curr, dir))
       return curr;
 
-    if (d.x != 0 &&
-        d.y != 0) {
-      if (jump_linear(
-              curr,
-              direction(d.x, 0).to_enum(),
-              start, end))
+    if (d.x != 0 && d.y != 0) {
+      if (jump_linear(curr, dir_horiz, start, end))
         return curr;
-      if (jump_linear(
-              curr,
-              direction(0, d.y).to_enum(),
-              start, end))
+      if (jump_linear(curr, dir_vert, start, end))
         return curr;
     }
   }
@@ -130,39 +125,28 @@ bool path_finder::has_forced_neighbor(point curr, e_dir dir) {
   const auto &d = EDIR_TO_DIR[static_cast<int>(dir)];
 
   // 1.直线探测
-  if (d.x != 0 &&
-      d.y == 0) { // Horizontal
+  if (d.x != 0 && d.y == 0) { // Horizontal
     if (!ctx.is_walkable({curr.x, curr.y + 1}) &&
-        ctx.is_walkable(
-            {curr.x + d.x, curr.y + 1}))
+        ctx.is_walkable({curr.x + d.x, curr.y + 1}))
       return true;
     if (!ctx.is_walkable({curr.x, curr.y - 1}) &&
-        ctx.is_walkable(
-            {curr.x + d.x, curr.y - 1}))
+        ctx.is_walkable({curr.x + d.x, curr.y - 1}))
       return true;
-  } else if (d.x == 0 &&
-             d.y != 0) { // Vertical
+  } else if (d.x == 0 && d.y != 0) { // Vertical
     if (!ctx.is_walkable({curr.x + 1, curr.y}) &&
-        ctx.is_walkable(
-            {curr.x + 1, curr.y + d.y}))
+        ctx.is_walkable({curr.x + 1, curr.y + d.y}))
       return true;
     if (!ctx.is_walkable({curr.x - 1, curr.y}) &&
-        ctx.is_walkable(
-            {curr.x - 1, curr.y + d.y}))
+        ctx.is_walkable({curr.x - 1, curr.y + d.y}))
       return true;
   }
   // 2.对角线探测
-  else if (d.x != 0 &&
-           d.y != 0) {
-    if (!ctx.is_walkable(
-            {curr.x - d.x, curr.y}) &&
-        ctx.is_walkable({curr.x - d.x,
-                         curr.y + d.y}))
+  else if (d.x != 0 && d.y != 0) {
+    if (!ctx.is_walkable({curr.x - d.x, curr.y}) &&
+        ctx.is_walkable({curr.x - d.x, curr.y + d.y}))
       return true;
-    if (!ctx.is_walkable(
-            {curr.x, curr.y - d.y}) &&
-        ctx.is_walkable({curr.x + d.x,
-                         curr.y - d.y}))
+    if (!ctx.is_walkable({curr.x, curr.y - d.y}) &&
+        ctx.is_walkable({curr.x + d.x, curr.y - d.y}))
       return true;
   }
   return false;
@@ -182,13 +166,13 @@ std::vector<point> path_finder::find_path(point start, point end) {
 
     search_directions sd = get_search_dirs(curr.dir);
     for (int i = 0; i < sd.count; i++) {
-      point jump_point = jump(curr, static_cast<e_dir>(sd.dirs[i]), start, end);
+      point jump_point = jump(curr, sd.dirs[i], start, end);
 
       if (jump_point != point{-1, -1}) {
         float new_g = curr.g + manhattan_plus(curr, jump_point, true);
         if (closed_list[jump_point.y][jump_point.x].g <= new_g)
           continue;
-        node next = {jump_point, curr, e_dir::NONE, new_g,
+        node next = {jump_point, curr, sd.dirs[i], new_g,
                      manhattan_plus(jump_point, end, true)};
         open_list.push(next);
         closed_list[jump_point.y][jump_point.x] = next;
