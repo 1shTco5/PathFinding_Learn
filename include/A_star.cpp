@@ -12,6 +12,7 @@ using namespace map_system;
 using namespace utils::distance;
 
 namespace path_finding {
+namespace A_star {
 direction dir[8] = {{{0, -1}, 1},      {{0, 1}, 1},        {{-1, 0}, 1},
                     {{1, 0}, 1},       {{-1, -1}, 1.414f}, {{-1, 1}, 1.414f},
                     {{1, -1}, 1.414f}, {{1, 1}, 1.414f}};
@@ -78,4 +79,5 @@ std::vector<point> A_star(grid_map &gmap, bool dir_8) {
 
   return path;
 }
+} // namespace A_star
 } // namespace path_finding

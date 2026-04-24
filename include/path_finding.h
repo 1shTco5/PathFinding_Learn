@@ -4,6 +4,7 @@
 using namespace map_system;
 
 namespace path_finding {
+namespace A_star {
 /**
  * @brief 定义节点
  * @property (x,y) 坐标
@@ -36,4 +37,5 @@ struct direction : public point {
  * @return 起点到终点的路径. 若不能到终点, 返回{}
  */
 std::vector<point> A_star(grid_map &gmap, bool dir_8 = false);
+} // namespace A_star
 } // namespace path_finding
