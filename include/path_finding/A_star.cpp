@@ -13,10 +13,6 @@ using namespace utils::distance;
 
 namespace path_finding {
 namespace A_star {
-direction dir[8] = {{{0, -1}, 1},      {{0, 1}, 1},        {{-1, 0}, 1},
-                    {{1, 0}, 1},       {{-1, -1}, 1.414f}, {{-1, 1}, 1.414f},
-                    {{1, -1}, 1.414f}, {{1, 1}, 1.414f}};
-
 std::vector<point> A_star(grid_map &gmap, bool dir_8) {
   std::vector<std::vector<int>> &grid = gmap.grid;
   int width = gmap.width;
@@ -46,17 +42,17 @@ std::vector<point> A_star(grid_map &gmap, bool dir_8) {
 
     int dir_count = dir_8 ? 8 : 4;
     for (int i = 0; i < dir_count; i++) {
-      int nx = curr.x + dir[i].x;
-      int ny = curr.y + dir[i].y;
+      int nx = curr.x + DIR[i].x;
+      int ny = curr.y + DIR[i].y;
 
       if (nx >= 0 && nx < width && ny >= 0 && ny < height &&
           grid[ny][nx] != 0) {
-        if (close_list[ny][nx].g <= curr.g + grid[ny][nx] * dir[i].dist_scale)
+        if (close_list[ny][nx].g <= curr.g + grid[ny][nx] * DIR[i].dist_scale)
           continue;
 
         node next = {{nx, ny},
                      curr,
-                     curr.g + grid[ny][nx] * dir[i].dist_scale,
+                     curr.g + grid[ny][nx] * DIR[i].dist_scale,
                      manhattan_plus({nx, ny}, end, dir_8)};
         open_list.push(next);
         close_list[ny][nx] = next;

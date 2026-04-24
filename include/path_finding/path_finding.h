@@ -17,19 +17,8 @@ struct node : public point {
   node(point curr, point parent, float g, float h)
       : point(curr), parent(parent), g(g), h(h) {}
 
-  double f() const { return g + h; }
-
-  bool operator>(const node &other) const { return f() > other.f(); }
-};
-
-/**
- * @breif 方向
- * @property dist_scale 直线方向倍数为 1 斜线方向倍数为 1.414
- */
-struct direction : public point {
-  float dist_scale;
-
-  direction(point dir, float scale) : point(dir), dist_scale(scale) {}
+  inline double f() const { return g + h; }
+  inline bool operator>(const node &other) const { return f() > other.f(); }
 };
 
 /**
@@ -39,8 +28,6 @@ struct direction : public point {
 std::vector<point> A_star(grid_map &gmap, bool dir_8 = false);
 } // namespace A_star
 
-namespace JPS {
-
-}
+namespace JPS {}
 
 } // namespace path_finding

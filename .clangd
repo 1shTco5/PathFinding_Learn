@@ -1,0 +1,17 @@
+CompileFlags:
+  Add: [
+      -DUNICODE,
+      -D_UNICODE,
+      "-std=c++17", # needed when using MSVC
+      # you should replace this to your own include path of this project
+      "-ID:/实习简历/PathFinding/PathFinding_Learn/include",
+      "-ID:/实习简历/PathFinding/PathFinding_Learn/include/path_finding",
+      "-ID:/实习简历/PathFinding/PathFinding_Learn/include/map_system",
+      "-ID:/实习简历/PathFinding/PathFinding_Learn/include/utils",
+      # -Wno-microsoft-goto,
+      # -Wno-nonportable-include-path,
+      # -Wno-microsoft-extra-qualification,
+      # -Wunused-variable,
+
+      # -Wno-unused-value,
+    ] # ignore some specific warnings
