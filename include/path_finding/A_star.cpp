@@ -41,11 +41,11 @@ std::vector<point> path_finder::find_path(point start, point end, bool dir_8) {
 
     int dir_count = dir_8 ? 8 : 4;
     for (int i = 0; i < dir_count; i++) {
-      int nx = curr.x + DIR[i].x;
-      int ny = curr.y + DIR[i].y;
+      int nx = curr.x + EDIR_TO_DIR[i].x;
+      int ny = curr.y + EDIR_TO_DIR[i].y;
 
       if (ctx.is_walkable({nx, ny})) {
-        float new_g = curr.g + ctx.get_cost({nx, ny}) * DIR[i].dist_scale;
+        float new_g = curr.g + ctx.get_cost({nx, ny}) * EDIR_TO_DIR[i].dist_scale;
         if (closed_list[ny][nx].g <= new_g)
           continue;
 

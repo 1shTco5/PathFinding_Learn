@@ -2,40 +2,9 @@
 #include <random>
 #include <utility>
 #include <vector>
+#include <map_defines.h>
 
 namespace map_system {
-
-inline constexpr float SQRT2 = 1.4142f;
-
-/**
- * @brief 网格点 (x,y)
- */
-struct point {
-  int x, y;
-
-  constexpr point(int x, int y) : x(x), y(y) {}
-
-  bool operator==(const point &other) { return x == other.x && y == other.y; }
-  bool operator!=(const point &other) { return !(*this == other); }
-};
-
-/**
- * @breif 方向
- * @property dist_scale 直线方向倍数为 1 斜线方向倍数为 1.414
- */
-struct direction : public point {
-  float dist_scale;
-
-  constexpr direction(point dir, float scale = 1)
-      : point(dir), dist_scale(scale) {}
-  constexpr direction(int x, int y, float scale = 1)
-      : point{x, y}, dist_scale(scale) {}
-};
-
-constexpr direction DIR[8] = {
-    {{0, -1}, 1},      {{0, 1}, 1},      {{-1, 0}, 1},     {{1, 0}, 1},
-    {{-1, -1}, SQRT2}, {{-1, 1}, SQRT2}, {{1, -1}, SQRT2}, {{1, 1}, SQRT2}};
-
 /**
  * @brief 用于寻路算法的只读接口
  */

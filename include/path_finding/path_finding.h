@@ -1,3 +1,4 @@
+#include "map_defines.h"
 #include <map_system.h>
 #include <queue>
 #include <vector>
@@ -60,15 +61,22 @@ std::vector<point> find_path(const i_path_context &ctx, point start, point end,
 namespace JPS {
 struct node : public point {
   point parent;
+  e_dir dir;
   float g, h;
-  constexpr node(point curr, point parent, float g, float h)
-      : point(curr), parent(parent), g(g), h(h) {}
+  constexpr node(point curr, point parent, e_dir dir, float g, float h)
+      : point(curr), parent(parent), dir(dir), g(g), h(h) {}
 
   inline double f() const { return g + h; }
   inline bool operator>(const node &other) const { return f() > other.f(); }
 };
 
-constexpr node default_node = {{-1, -1}, {-1, -1}, FLT_MAX, FLT_MAX};
+struct search_directions {
+  // e_dirs dirs[5]; // JPS 最多需要检查5个方向: 3(对角检测) + 2(强迫邻居)
+  e_dir dirs[8]; // 检查8个方向 兼容起点 (或者检查5个方向 把起点单独考虑 )
+  int count = 0;
+};
+
+constexpr node default_node = {{-1, -1}, {-1, -1}, e_dir::NONE, FLT_MAX, FLT_MAX};
 
 /**
  * @brief JPS寻路器
@@ -81,15 +89,15 @@ private:
   std::vector<std::vector<node>> closed_list;
 
   void init(point start, point end);
-  point jump(point p, direction dir, point start, point end);
-  bool has_forced_neighbor(point p, direction dir);
+  search_directions get_search_dirs(e_dir dir);
+  point jump(point curr, e_dir dir, point start, point end);
+  bool jump_linear(point curr, e_dir dir, point start, point end);
+  bool has_forced_neighbor(point curr, e_dir dir);
 
 public:
   path_finder(const i_path_context &ctx) : ctx(ctx) {
-    closed_list.resize(
-        ctx.get_height(),
-        std::vector<node>(ctx.get_width(),
-                          {{-1, -1}, {-1, -1}, FLT_MAX, FLT_MAX}));
+    closed_list.resize(ctx.get_height(),
+                       std::vector<node>(ctx.get_width(), default_node));
   }
 
   std::vector<point> find_path(point start, point end);
