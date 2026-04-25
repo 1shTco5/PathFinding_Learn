@@ -1,6 +1,6 @@
 #include <algorithm>
-#include <cfloat>
 #include <map_system.h>
+#include <memory>
 #include <path_finding.h>
 #include <queue>
 #include <utils.h>
@@ -19,60 +19,64 @@ std::vector<point> find_path(const i_path_context &ctx, point start, point end,
 void path_finder::init(point start, point end, bool dir_8) {
   open_list = {};
   for (int i = 0; i < ctx.get_height(); i++) {
-    closed_list[i].assign(ctx.get_width(), default_node);
+    closed_list[i].assign(ctx.get_width(), nullptr);
   }
 
-  node start_node = {start, {-1, -1}, 0, manhattan_plus(start, end, dir_8)};
+  auto start_node = std::make_shared<node>(start, nullptr, 0.0f,
+                                           manhattan_plus(start, end, dir_8));
   open_list.push(start_node);
-  closed_list[start.y][start.x] = start_node;
 }
 
 std::vector<point> path_finder::find_path(point start, point end, bool dir_8) {
   init(start, end, dir_8);
 
   while (!open_list.empty()) {
-    node curr = open_list.top();
+    auto curr = open_list.top();
     open_list.pop();
 
-    if (curr == end)
-      break;
-    if (curr.g > closed_list[curr.y][curr.x].g)
+    // 检查closed_list中是否存在更优路径
+    if (closed_list[curr->y][curr->x] &&
+        closed_list[curr->y][curr->x]->g <= curr->g)
       continue;
+
+    // 检查是否到达终点
+    if (*curr == end) {
+      // 重构路径
+      std::vector<point> path;
+      auto node = curr;
+      while (node) {
+        path.push_back(*node);
+        node = node->parent;
+      }
+      std::reverse(path.begin(), path.end());
+      return path;
+    }
+
+    // 将当前节点加入 closed_list
+    closed_list[curr->y][curr->x] = curr;
 
     int dir_count = dir_8 ? 8 : 4;
     for (int i = 0; i < dir_count; i++) {
-      int nx = curr.x + EDIR_TO_DIR[i].x;
-      int ny = curr.y + EDIR_TO_DIR[i].y;
+      int nx = curr->x + EDIR_TO_DIR[i].x;
+      int ny = curr->y + EDIR_TO_DIR[i].y;
+      point np = {nx, ny};
 
-      if (ctx.is_walkable({nx, ny})) {
-        float new_g = curr.g + ctx.get_cost({nx, ny}) * EDIR_TO_DIR[i].dist_scale;
-        if (closed_list[ny][nx].g <= new_g)
-          continue;
+      if (!ctx.is_walkable(np))
+        continue;
 
-        node next = {{nx, ny},
-                     curr,
-                     new_g,
-                     manhattan_plus({nx, ny}, end, dir_8)};
-        open_list.push(next);
-        closed_list[ny][nx] = next;
-      }
+      float new_g = curr->g + ctx.get_cost(np) * EDIR_TO_DIR[i].dist_scale;
+      // 查找closed_list 中是否以及存储该节点
+      // 如果存在更优路径
+      if (closed_list[ny][nx] && closed_list[ny][nx]->g <= new_g)
+        continue;
+
+      auto next = std::make_shared<node>(np, curr, new_g,
+                                         manhattan_plus(np, end, dir_8));
+      open_list.push(next);
     }
   }
 
-  if (closed_list[end.y][end.x].g == FLT_MAX)
-    return {};
-
-  std::vector<point> path;
-  node curr = closed_list[end.y][end.x];
-  while (true) {
-    path.push_back(curr);
-    if (curr.parent.x == -1 && curr.parent.y == -1)
-      break;
-    curr = closed_list[curr.parent.y][curr.parent.x];
-  }
-  std::reverse(path.begin(), path.end());
-
-  return path;
+  return {};
 }
 } // namespace A_star
 } // namespace path_finding

@@ -1,6 +1,10 @@
 #include "map_defines.h"
+#include <functional>
 #include <map_system.h>
+#include <memory>
 #include <queue>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 using namespace map_system;
@@ -9,21 +13,27 @@ namespace path_finding {
 namespace A_star {
 /**
  * @brief 定义节点
+ * @property parent 父节点指针
  * @property (x,y) 坐标
  * @property g 已走距离
  * @property h 预估到终点距离
  */
 struct node : public point {
-  point parent;
+  std::shared_ptr<node> parent;
   float g, h;
-  constexpr node(point curr, point parent, float g, float h)
+  node(point curr, std::shared_ptr<node> parent, float g, float h)
       : point(curr), parent(parent), g(g), h(h) {}
 
-  inline double f() const { return g + h; }
-  inline bool operator>(const node &other) const { return f() > other.f(); }
+  float f() const { return g + h; }
+  bool operator>(const node &other) const { return f() > other.f(); }
 };
 
-constexpr node default_node = {{-1, -1}, {-1, -1}, FLT_MAX, FLT_MAX};
+struct node_cmp {
+  bool operator()(const std::shared_ptr<node> &a,
+                  const std::shared_ptr<node> &b) {
+    return a->f() > b->f();
+  }
+};
 
 /**
  * @brief A_start寻路器
@@ -32,20 +42,20 @@ class path_finder {
 private:
   const i_path_context &ctx;
   /**
-   * @open_list 存储待处理点 用优先队列 快速找到启发式函数最小的点
-   * @close_list 标记已处理点 同时记录当前点的父节点 用于回溯路线
+   * @property open_list 存储待处理点 用优先队列 快速找到启发式函数最小的点
+   * @property close_list 存储已处理点
    */
-  std::priority_queue<node, std::vector<node>, std::greater<node>> open_list;
-  std::vector<std::vector<node>> closed_list;
+  std::priority_queue<std::shared_ptr<node>, std::vector<std::shared_ptr<node>>,
+                      node_cmp>
+      open_list;
+  std::vector<std::vector<std::shared_ptr<node>>> closed_list;
 
   void init(point start, point end, bool dir_8);
 
 public:
   path_finder(const i_path_context &ctx) : ctx(ctx) {
-    closed_list.resize(
-        ctx.get_height(),
-        std::vector<node>(ctx.get_width(),
-                          {{-1, -1}, {-1, -1}, FLT_MAX, FLT_MAX}));
+    closed_list.resize(ctx.get_height(), std::vector<std::shared_ptr<node>>(
+                                             ctx.get_width(), nullptr));
   }
   std::vector<point> find_path(point start, point end, bool dir_8);
 };
@@ -76,7 +86,8 @@ struct search_directions {
   int count = 0;
 };
 
-constexpr node default_node = {{-1, -1}, {-1, -1}, e_dir::NONE, FLT_MAX, FLT_MAX};
+constexpr node default_node = {
+    {-1, -1}, {-1, -1}, e_dir::NONE, FLT_MAX, FLT_MAX};
 
 /**
  * @brief JPS寻路器

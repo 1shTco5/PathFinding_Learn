@@ -11,30 +11,29 @@ int main(int argc, char *argv[]) {
   bool should_print = (argc > 1 && std::string(argv[1]) == "1");
 
   grid_map gmap = get_grid_map();
-  if (should_print) {
-    cout << "--- Initial Map ---" << endl;
-    gmap.print();
-  }
+  // if (should_print) {
+  //   cout << "--- Initial Map ---" << endl;
+  //   gmap.print();
+  // }
   // {
   //   time::timer timer("--- A star[4 dir] ---");
-  //   gmap.path = A_star::find_path(gmap, gmap.start, gmap.end);
+  //   gmap.path = A_star::find_path(gmap, gmap.start, gmap.end, false);
+  //   cout << "Node [A star[4 dir]]: " << gmap.path.size() << endl;
   // }
   // if (should_print)
   //   gmap.print(true);
   {
     time::timer timer("--- A star[8 dir] ---");
     gmap.path = A_star::find_path(gmap, gmap.start, gmap.end, true);
+    cout << "Node [A star[8 dir]]: " << gmap.path.size() << endl;
   }
-  if (should_print) {
+  if (should_print)
     gmap.print(true);
-    cout << "Node [A star]: " << gmap.path.size() << endl;
-  }
   {
     time::timer timer("--- JPS ---");
     gmap.path = JPS::find_path(gmap, gmap.start, gmap.end);
-  }
-  if (should_print) {
-    gmap.print(true);
     cout << "Node [JPS]: " << gmap.path.size() << endl;
   }
+  if (should_print)
+    gmap.print(true);
 }

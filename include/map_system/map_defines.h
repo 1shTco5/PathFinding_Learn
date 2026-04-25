@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+#include <functional>
 namespace map_system {
 inline constexpr float SQRT2 = 1.4142f;
 
@@ -33,8 +35,14 @@ struct point {
 
   constexpr point(int x, int y) : x(x), y(y) {}
 
-  bool operator==(const point &other) { return x == other.x && y == other.y; }
-  bool operator!=(const point &other) { return !(*this == other); }
+  bool operator==(const point &other) const { return x == other.x && y == other.y; }
+  bool operator!=(const point &other) const { return !(*this == other); }
+};
+
+struct point_hash {
+  size_t operator()(const point &p) const {
+    return std::hash<int>()(p.x) ^ (std::hash<int>()(p.y) << 1);
+  }
 };
 
 /**
